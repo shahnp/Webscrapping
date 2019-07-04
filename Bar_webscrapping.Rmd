@@ -1,0 +1,57 @@
+---
+title: "Bar_webscrapping"
+author: "Pankaj Shah"
+date: "7/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages("rvest")
+library("rvest")
+
+URL <- "http://santabarbaraca.com/explore-and-discover-santa-barbara/neighborhoods-towns/santa-barbara/the-funk-zone/"
+
+# Read the webpage into R
+webpage <- read_html(URL)
+
+# Parse the webpage for bars
+bars <- html_nodes(webpage, ".neighborhoods-towns-business .neighborhoods-towns-business-title")
+
+# Extract the name of the bar
+bar_names <- html_text(bars)
+
+bar_names
+```
+
+```{r}
+# Parse the page for the nodes containing the website URLs
+websites <- html_nodes(webpage, ".neighborhoods-towns-business .website-button")
+
+# Extract the reference 
+websites_urls <- html_attr(websites, "href")
+
+websites_urls
+```
+
+```{r}
+# Get the index of the missing bar
+mb_ind <- which(bar_names == "Municipal Winemakers")
+
+# add the URL
+websites_urls <- append(websites_urls, "http://www.municipalwinemakers.com/", after = mb_ind-1)
+```
+
+```{r}
+# Create the data frame
+my_cool_bars <- data.frame(funkzone_bar = bar_names, 
+                           website = websites_urls)
+
+# my_cool_bars
+
+# write it to csv
+# write.csv(my_cool_bars, "~/oss/places_you_will_go.csv", row.names = FALSE)
+```
